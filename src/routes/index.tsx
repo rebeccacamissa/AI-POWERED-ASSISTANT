@@ -80,7 +80,7 @@ function Index() {
           <div className="px-6 md:px-10 py-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
             <div className="min-w-0">
               <h1 className="font-serif text-2xl md:text-3xl text-primary truncate">
-                Welcome back, <span className="italic">Alexandra</span>
+                Welcome back, <span className="italic">Rebecca Adams</span>
               </h1>
               <p className="text-xs md:text-sm text-muted-foreground mt-1">{today}</p>
             </div>
@@ -188,9 +188,9 @@ function EmailModule() {
     if (!topic.trim()) return;
     const greetings = { Formal: "Dear Colleague,", Friendly: "Hi there,", Persuasive: "Hello," };
     const closings = {
-      Formal: "Kindly let me know your thoughts at your earliest convenience.\n\nWarm regards,\nAlexandra",
-      Friendly: "Let me know what you think — would love to hear from you soon!\n\nCheers,\nAlexandra",
-      Persuasive: "I'm confident this represents a meaningful opportunity, and I'd welcome the chance to discuss it further.\n\nSincerely,\nAlexandra",
+      Formal: "Kindly let me know your thoughts at your earliest convenience.\n\nWarm regards,\nRebecca Adams",
+      Friendly: "Let me know what you think — would love to hear from you soon!\n\nCheers,\nRebecca Adams",
+      Persuasive: "I'm confident this represents a meaningful opportunity, and I'd welcome the chance to discuss it further.\n\nSincerely,\nRebecca Adams",
     };
     const bodies = {
       Formal: `I hope this message finds you well. I am writing to discuss ${topic}. Based on recent developments, I believe this matter warrants our shared attention and a coordinated response.`,
@@ -280,7 +280,7 @@ function NotesModule() {
     setResult({
       summary: `The meeting covered ${wc} words of discussion centered on strategic priorities, cross-functional alignment, and upcoming deliverables. Stakeholders agreed on accelerated timelines and clarified ownership for the next sprint cycle.`,
       actions: [
-        "Alexandra to circulate revised proposal by Friday, EOD",
+        "Rebecca Adams to circulate revised proposal by Friday, EOD",
         "Marketing team to deliver creative brief within 5 business days",
         "Schedule follow-up review session for next Tuesday at 10:00 AM",
         "Finance to validate Q4 budget allocation by month-end",
@@ -524,7 +524,7 @@ const QUICK = ["Summarize my inbox", "Draft a thank-you note", "Plan a focus blo
 
 function ChatModule() {
   const [messages, setMessages] = useState<Msg[]>([
-    { role: "ai", text: "Good day, Alexandra. I'm Atelier — your discreet workplace assistant. How may I be of service?" },
+    { role: "ai", text: "Good day, Rebecca Adams. I'm Atelier — your discreet workplace assistant. How may I be of service?" },
   ]);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
