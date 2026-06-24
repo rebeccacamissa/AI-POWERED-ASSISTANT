@@ -92,7 +92,7 @@ function Index() {
                 </span>
               </div>
               <div className="h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-serif text-sm shadow-[var(--shadow-luxury)]">
-                AM
+                RA
               </div>
             </div>
           </div>
