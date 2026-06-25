@@ -1,608 +1,969 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useRef, useState, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import {
-  Mail, FileText, CalendarClock, Search, MessageSquare,
-  Sparkles, Copy, Check, Send, ShieldCheck, Clock, ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Maximize2,
+  Minimize2,
+  Pencil,
+  Eye,
+  Mail,
+  ListChecks,
+  CalendarClock,
+  Cpu,
+  Cloud,
+  ShieldCheck,
+  AlertTriangle,
+  TerminalSquare,
+  Play,
+  Pause,
+  Sparkles,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "AI Workplace Productivity Assistant" },
-      { name: "description", content: "An elegant AI-powered workplace assistant: smart email, meeting summaries, task planning, research, and chat." },
-      { property: "og:title", content: "AI Workplace Productivity Assistant" },
-      { property: "og:description", content: "Premium AI productivity suite for the modern professional." },
-    ],
-  }),
-  component: Index,
+  component: DeckPage,
 });
 
-type ViewKey = "email" | "notes" | "planner" | "research" | "chat";
+/* ---------- Palette ---------- */
+const NAVY = "#1F2A44";
+const BEIGE = "#E8DCC8";
+const GOLD = "#C6A75E";
 
-const NAV: { key: ViewKey; label: string; icon: typeof Mail }[] = [
-  { key: "email", label: "Smart Email", icon: Mail },
-  { key: "notes", label: "Meeting Notes", icon: FileText },
-  { key: "planner", label: "Task Planner", icon: CalendarClock },
-  { key: "research", label: "Research Assistant", icon: Search },
-  { key: "chat", label: "AI Chat", icon: MessageSquare },
-];
+const serif: CSSProperties = { fontFamily: "'Cinzel', 'Playfair Display', serif" };
+const display: CSSProperties = { fontFamily: "'Playfair Display', serif" };
+const sans: CSSProperties = { fontFamily: "'Inter', 'Montserrat', system-ui, sans-serif" };
+const mono: CSSProperties = { fontFamily: "'JetBrains Mono', ui-monospace, monospace" };
 
-function Index() {
-  const [view, setView] = useState<ViewKey>("email");
-  const today = useMemo(
-    () => new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }),
-    []
+/* ---------- Van Gogh decorative SVG ---------- */
+function StarryBackdrop({ dense = true }: { dense?: boolean }) {
+  const stars = useMemo(
+    () =>
+      Array.from({ length: dense ? 36 : 14 }, (_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        r: Math.random() * 1.6 + 0.6,
+        delay: Math.random() * 3,
+      })),
+    [dense],
   );
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <svg className="absolute inset-0 h-full w-full opacity-[0.18]" viewBox="0 0 1200 700" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="goldStroke" x1="0" x2="1">
+            <stop offset="0%" stopColor={GOLD} stopOpacity="0.05" />
+            <stop offset="50%" stopColor={GOLD} stopOpacity="0.9" />
+            <stop offset="100%" stopColor={GOLD} stopOpacity="0.05" />
+          </linearGradient>
+        </defs>
+        <g fill="none" stroke="url(#goldStroke)" strokeWidth="1.2">
+          <path d="M-50,520 C200,420 320,640 540,500 C740,380 900,560 1250,420" />
+          <path d="M-50,300 C220,220 380,420 600,300 C820,180 980,360 1250,260" opacity="0.6" />
+          <path d="M-50,640 C200,560 420,720 640,620 C840,540 1020,680 1250,580" opacity="0.5" />
+        </g>
+        <g fill="none" stroke={NAVY} strokeOpacity="0.35" strokeWidth="1">
+          <circle cx="240" cy="180" r="70" />
+          <circle cx="240" cy="180" r="110" opacity="0.5" />
+          <circle cx="960" cy="520" r="90" />
+          <circle cx="960" cy="520" r="140" opacity="0.45" />
+        </g>
+      </svg>
+      <div className="absolute inset-0">
+        {stars.map((s) => (
+          <span
+            key={s.id}
+            className="absolute animate-pulse rounded-full"
+            style={{
+              left: `${s.x}%`,
+              top: `${s.y}%`,
+              width: `${s.r * 2}px`,
+              height: `${s.r * 2}px`,
+              background: GOLD,
+              boxShadow: `0 0 ${s.r * 6}px ${GOLD}`,
+              animationDelay: `${s.delay}s`,
+              opacity: 0.8,
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SwirlLight() {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <svg className="absolute -right-20 -top-20 h-[420px] w-[420px] opacity-30" viewBox="0 0 200 200">
+        <g fill="none" stroke={GOLD} strokeWidth="1.2">
+          <circle cx="100" cy="100" r="30" />
+          <circle cx="100" cy="100" r="50" opacity="0.7" />
+          <circle cx="100" cy="100" r="72" opacity="0.5" />
+          <circle cx="100" cy="100" r="94" opacity="0.3" />
+        </g>
+      </svg>
+      <svg className="absolute -bottom-24 -left-16 h-[360px] w-[360px] opacity-25" viewBox="0 0 200 200">
+        <g fill="none" stroke={NAVY} strokeWidth="1">
+          <path d="M20,120 C60,80 100,160 180,100" />
+          <path d="M20,140 C60,100 100,180 180,120" opacity="0.6" />
+          <path d="M20,160 C60,120 100,200 180,140" opacity="0.4" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+/* ---------- Editable primitive ---------- */
+function Editable({
+  value,
+  onChange,
+  editMode,
+  as: Tag = "div",
+  className = "",
+  style,
+  multiline = false,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  editMode: boolean;
+  as?: keyof React.JSX.IntrinsicElements;
+  className?: string;
+  style?: CSSProperties;
+  multiline?: boolean;
+}) {
+  const ref = useRef<HTMLElement | null>(null);
+  const AnyTag = Tag as unknown as React.ElementType;
+
+  // Set text once when entering edit mode / value changes externally
+  useEffect(() => {
+    if (ref.current && ref.current.innerText !== value) {
+      ref.current.innerText = value;
+    }
+  }, [value, editMode]);
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
-      <aside className="hidden md:flex sticky top-0 h-screen w-72 flex-col bg-secondary/60 border-r border-border/60 px-6 py-8">
-        <div className="flex items-center gap-3 mb-12">
-          <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center shadow-[var(--shadow-gold)]">
-            <Sparkles className="h-5 w-5 text-accent" />
+    <AnyTag
+      ref={ref}
+      contentEditable={editMode}
+      suppressContentEditableWarning
+      onBlur={(e: any) => onChange(e.currentTarget.innerText)}
+      onKeyDown={(e: any) => {
+        if (!multiline && e.key === "Enter") {
+          e.preventDefault();
+          (e.currentTarget as HTMLElement).blur();
+        }
+        e.stopPropagation();
+      }}
+      className={`${className} ${editMode ? "outline-dashed outline-1 outline-offset-4 rounded-sm" : ""}`}
+      style={{ ...style, outlineColor: editMode ? GOLD : undefined }}
+    >
+      {value}
+    </AnyTag>
+  );
+}
+
+/* ---------- Slide data model ---------- */
+type Deck = {
+  s1: { title: string; subtitle: string; intro: string };
+  s2: { heading: string; bullets: string[]; caption: string };
+  s3: { heading: string; cards: { title: string; body: string }[] };
+  s4: { heading: string; left: { title: string; body: string }; right: { title: string; body: string } };
+  s5: { heading: string; body: string; code: string };
+  s6: { heading: string; challenge: string; resolution: string };
+  s7: { heading: string; mediaUrl: string };
+  s8: { thanks: string; name: string; contact: string };
+};
+
+const DEFAULT_DECK: Deck = {
+  s1: {
+    title: "Atelier AI",
+    subtitle: "Workplace Productivity Assistant",
+    intro:
+      "An elegant, single-platform AI atelier — crafting the everyday rituals of modern professionals into something effortless, refined, and remarkably human.",
+  },
+  s2: {
+    heading: "The Administrative Drag",
+    bullets: [
+      "Professionals spend over 40% of the workday drafting emails, summarising notes, and planning tasks.",
+      "Context is lost between tools — calendar, inbox, transcript, and to-do list rarely speak the same language.",
+      "Cognitive overhead grows with every tab; deep work shrinks to the margins of the day.",
+      "Manual triage of meeting notes and follow-ups delays decisions by hours, sometimes days.",
+    ],
+    caption: "An artistic study of the modern desk — paperwork in midnight and gold.",
+  },
+  s3: {
+    heading: "A Single Atelier for Three Crafts",
+    cards: [
+      {
+        title: "Smart Email Generator",
+        body: "Tone-aware drafting — formal, friendly, persuasive — grounded in recipient context and intent.",
+      },
+      {
+        title: "Meeting Notes Summarizer",
+        body: "Extracts decisions, action items, owners and deadlines from raw transcripts in seconds.",
+      },
+      {
+        title: "AI Task Planner",
+        body: "Time-blocks the day into a chronological 9-to-5 schedule, balancing focus and recovery.",
+      },
+    ],
+  },
+  s4: {
+    heading: "Technological Foundation",
+    left: {
+      title: "AI Model Integration",
+      body: "Gemini 1.5 Flash for high-throughput generation. GPT-4o for nuanced, contextual tone. Routed per task for cost and quality.",
+    },
+    right: {
+      title: "Deployment Framework",
+      body: "Built on Lovable's full-stack builder nodes. Distributed via Vercel's edge cloud for sub-100ms global delivery.",
+    },
+  },
+  s5: {
+    heading: "Elite Prompt Engineering",
+    body: "Atelier AI is governed by a structured prompt matrix: Role-Grounded Personas anchor identity, Hard Boundary Constraints enforce scope, and Ethical Safeguard filters review every response before it leaves the model.",
+    code:
+`SYSTEM DIRECTIVE — Atelier AI v1.2
+--------------------------------------
+role        : "Executive productivity concierge"
+persona     : grounded, gracious, precise
+constraints :
+  - no fabricated names, dates, or figures
+  - decline requests outside professional scope
+  - always cite source when summarising
+safeguards  :
+  - PII redaction pass
+  - tone audit (formal | friendly | persuasive)
+  - hallucination self-check before emit
+output      : structured, review-ready, human-editable`,
+  },
+  s6: {
+    heading: "Challenges & Resolutions",
+    challenge:
+      "A security advisory surfaced against @tanstack/react-start and its transitive undici dependency — a blocker for production deployment.",
+    resolution:
+      "A single directive to Lovable's terminal: run a dependency audit, align versions, and pin router-core. Lockfile cleared with zero manual struggle.",
+  },
+  s7: {
+    heading: "Live Demonstration",
+    mediaUrl: "",
+  },
+  s8: {
+    thanks: "Thank You",
+    name: "Rebecca Adams",
+    contact: "rebeccaadams.dev  |  hello@capaciti.org.za",
+  },
+};
+
+/* ---------- Slide chrome ---------- */
+function SlideShell({
+  theme,
+  children,
+}: {
+  theme: "dark" | "light";
+  children: ReactNode;
+}) {
+  const dark = theme === "dark";
+  return (
+    <div
+      className="relative h-full w-full overflow-hidden"
+      style={{
+        background: dark
+          ? `radial-gradient(1200px 700px at 20% 20%, #2a3a5e 0%, ${NAVY} 55%, #141c30 100%)`
+          : `linear-gradient(180deg, #f3ead7 0%, ${BEIGE} 100%)`,
+        color: dark ? BEIGE : NAVY,
+      }}
+    >
+      {dark ? <StarryBackdrop /> : <SwirlLight />}
+      <div className="relative z-10 h-full w-full px-10 py-12 md:px-20 md:py-16">{children}</div>
+    </div>
+  );
+}
+
+/* ---------- Individual slides ---------- */
+function Slide1({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boolean }) {
+  return (
+    <SlideShell theme="dark">
+      <div className="flex h-full flex-col items-center justify-center text-center">
+        <div className="mb-6 flex items-center gap-3 text-xs uppercase tracking-[0.4em]" style={{ color: GOLD, ...sans }}>
+          <Sparkles size={14} /> An evening with productivity
+        </div>
+        <Editable
+          as="h1"
+          value={d.s1.title}
+          onChange={(v) => set({ ...d, s1: { ...d.s1, title: v } })}
+          editMode={edit}
+          className="text-6xl md:text-8xl font-medium leading-none"
+          style={{ ...serif, color: BEIGE, letterSpacing: "0.08em" }}
+        />
+        <div className="my-6 h-px w-40" style={{ background: GOLD }} />
+        <Editable
+          as="h2"
+          value={d.s1.subtitle}
+          onChange={(v) => set({ ...d, s1: { ...d.s1, subtitle: v } })}
+          editMode={edit}
+          className="text-xl md:text-2xl italic"
+          style={{ ...display, color: GOLD }}
+        />
+        <Editable
+          value={d.s1.intro}
+          onChange={(v) => set({ ...d, s1: { ...d.s1, intro: v } })}
+          editMode={edit}
+          multiline
+          className="mt-8 max-w-2xl text-base md:text-lg leading-relaxed"
+          style={{ ...sans, color: "#dcd2ba", opacity: 0.85 }}
+        />
+      </div>
+    </SlideShell>
+  );
+}
+
+function Slide2({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boolean }) {
+  return (
+    <SlideShell theme="light">
+      <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2 md:gap-16">
+        <div className="flex flex-col justify-center">
+          <div className="mb-3 text-xs uppercase tracking-[0.4em]" style={{ color: GOLD, ...sans }}>
+            Problem Statement
           </div>
-          <div>
-            <p className="font-serif text-lg leading-tight text-primary">Atelier AI</p>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Workplace Suite</p>
+          <Editable
+            as="h2"
+            value={d.s2.heading}
+            onChange={(v) => set({ ...d, s2: { ...d.s2, heading: v } })}
+            editMode={edit}
+            className="text-4xl md:text-6xl font-medium leading-tight"
+            style={{ ...display, color: NAVY }}
+          />
+          <ul className="mt-8 space-y-4">
+            {d.s2.bullets.map((b, i) => (
+              <li key={i} className="flex gap-3" style={sans}>
+                <span className="mt-2 inline-block h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: GOLD }} />
+                <Editable
+                  value={b}
+                  onChange={(v) => {
+                    const next = [...d.s2.bullets];
+                    next[i] = v;
+                    set({ ...d, s2: { ...d.s2, bullets: next } });
+                  }}
+                  editMode={edit}
+                  multiline
+                  className="text-base md:text-lg leading-relaxed"
+                  style={{ color: NAVY }}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="flex items-center justify-center">
+          <div
+            className="relative aspect-[4/5] w-full max-w-md rounded-sm p-4"
+            style={{ background: "#fff", boxShadow: `0 30px 60px -30px ${NAVY}55`, border: `1px solid ${GOLD}55` }}
+          >
+            <div className="relative h-full w-full overflow-hidden" style={{ background: NAVY }}>
+              <svg viewBox="0 0 300 380" className="h-full w-full">
+                <defs>
+                  <pattern id="paper" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <rect width="20" height="20" fill={NAVY} />
+                    <path d="M0 10 H20" stroke={GOLD} strokeOpacity="0.08" />
+                  </pattern>
+                </defs>
+                <rect width="300" height="380" fill="url(#paper)" />
+                {Array.from({ length: 9 }).map((_, i) => (
+                  <rect
+                    key={i}
+                    x={30 + (i % 3) * 80}
+                    y={30 + Math.floor(i / 3) * 110}
+                    width="70"
+                    height="95"
+                    fill="none"
+                    stroke={GOLD}
+                    strokeOpacity={0.5 + (i % 3) * 0.15}
+                    transform={`rotate(${(i - 4) * 3} ${65 + (i % 3) * 80} ${78 + Math.floor(i / 3) * 110})`}
+                  />
+                ))}
+                <circle cx="240" cy="60" r="22" fill="none" stroke={GOLD} />
+                <circle cx="240" cy="60" r="34" fill="none" stroke={GOLD} strokeOpacity="0.5" />
+              </svg>
+              <div
+                className="absolute bottom-3 left-3 right-3 text-center text-xs italic"
+                style={{ ...display, color: BEIGE, opacity: 0.7 }}
+              >
+                <Editable
+                  value={d.s2.caption}
+                  onChange={(v) => set({ ...d, s2: { ...d.s2, caption: v } })}
+                  editMode={edit}
+                />
+              </div>
+            </div>
           </div>
         </div>
-        <nav className="flex-1 space-y-1">
-          {NAV.map(({ key, label, icon: Icon }) => {
-            const active = view === key;
+      </div>
+    </SlideShell>
+  );
+}
+
+function Slide3({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boolean }) {
+  const icons = [Mail, ListChecks, CalendarClock];
+  return (
+    <SlideShell theme="dark">
+      <div className="flex h-full flex-col">
+        <div className="text-xs uppercase tracking-[0.4em]" style={{ color: GOLD, ...sans }}>
+          Solution Overview
+        </div>
+        <Editable
+          as="h2"
+          value={d.s3.heading}
+          onChange={(v) => set({ ...d, s3: { ...d.s3, heading: v } })}
+          editMode={edit}
+          className="mt-2 text-4xl md:text-5xl font-medium"
+          style={{ ...display, color: BEIGE }}
+        />
+        <div className="mt-12 grid flex-1 grid-cols-1 gap-6 md:grid-cols-3">
+          {d.s3.cards.map((c, i) => {
+            const Icon = icons[i] ?? Mail;
             return (
-              <button
-                key={key}
-                onClick={() => setView(key)}
-                className={`group w-full flex items-center gap-3 px-4 py-3 rounded-md font-serif text-[17px] transition-all
-                  ${active
-                    ? "bg-card text-primary border-l-2 border-accent shadow-sm"
-                    : "text-primary/75 hover:text-primary hover:bg-card/60 border-l-2 border-transparent"}`}
+              <div
+                key={i}
+                className="relative flex flex-col rounded-lg p-7 backdrop-blur-md"
+                style={{
+                  background: "rgba(255,255,255,0.04)",
+                  border: `1px solid ${GOLD}33`,
+                  boxShadow: `0 20px 50px -20px ${NAVY}`,
+                }}
               >
-                <Icon className={`h-4 w-4 ${active ? "text-accent" : "text-primary/60"}`} />
-                <span>{label}</span>
-              </button>
+                <div
+                  className="flex h-12 w-12 items-center justify-center rounded-md"
+                  style={{ background: `${GOLD}22`, border: `1px solid ${GOLD}66`, color: GOLD }}
+                >
+                  <Icon size={22} />
+                </div>
+                <Editable
+                  as="h3"
+                  value={c.title}
+                  onChange={(v) => {
+                    const cards = [...d.s3.cards];
+                    cards[i] = { ...c, title: v };
+                    set({ ...d, s3: { ...d.s3, cards } });
+                  }}
+                  editMode={edit}
+                  className="mt-5 text-2xl"
+                  style={{ ...display, color: BEIGE }}
+                />
+                <Editable
+                  value={c.body}
+                  onChange={(v) => {
+                    const cards = [...d.s3.cards];
+                    cards[i] = { ...c, body: v };
+                    set({ ...d, s3: { ...d.s3, cards } });
+                  }}
+                  editMode={edit}
+                  multiline
+                  className="mt-3 text-sm leading-relaxed"
+                  style={{ ...sans, color: "#d4c9af", opacity: 0.85 }}
+                />
+              </div>
             );
           })}
-        </nav>
-        <div className="pt-6 mt-6 border-t border-border/60">
-          <p className="font-serif italic text-sm text-primary/70 leading-relaxed">
-            "Elegance is refusal."
-          </p>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-2">— Coco Chanel</p>
         </div>
-      </aside>
+      </div>
+    </SlideShell>
+  );
+}
 
-      {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top header */}
-        <header className="sticky top-0 z-10 bg-background/85 backdrop-blur-md border-b border-border/60">
-          <div className="px-6 md:px-10 py-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
-            <div className="min-w-0">
-              <h1 className="font-serif text-2xl md:text-3xl text-primary truncate">
-                Welcome back, <span className="italic">Rebecca Adams</span>
-              </h1>
-              <p className="text-xs md:text-sm text-muted-foreground mt-1">{today}</p>
+function Slide4({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boolean }) {
+  const Tile = ({
+    icon,
+    title,
+    body,
+    onTitle,
+    onBody,
+  }: {
+    icon: ReactNode;
+    title: string;
+    body: string;
+    onTitle: (v: string) => void;
+    onBody: (v: string) => void;
+  }) => (
+    <div className="rounded-lg bg-white p-8" style={{ border: `1px solid ${GOLD}55`, boxShadow: `0 20px 40px -25px ${NAVY}55` }}>
+      <div className="flex items-center gap-3" style={{ color: GOLD }}>
+        {icon}
+        <Editable as="h3" value={title} onChange={onTitle} editMode={edit} className="text-2xl" style={{ ...display, color: NAVY }} />
+      </div>
+      <div className="my-4 h-px w-12" style={{ background: GOLD }} />
+      <Editable
+        value={body}
+        onChange={onBody}
+        editMode={edit}
+        multiline
+        className="text-base leading-relaxed"
+        style={{ ...sans, color: NAVY, opacity: 0.85 }}
+      />
+    </div>
+  );
+  return (
+    <SlideShell theme="light">
+      <div className="flex h-full flex-col">
+        <div className="text-xs uppercase tracking-[0.4em]" style={{ color: GOLD, ...sans }}>
+          Architecture
+        </div>
+        <Editable
+          as="h2"
+          value={d.s4.heading}
+          onChange={(v) => set({ ...d, s4: { ...d.s4, heading: v } })}
+          editMode={edit}
+          className="mt-2 text-4xl md:text-5xl font-medium"
+          style={{ ...display, color: NAVY }}
+        />
+        <div className="mt-10 grid flex-1 grid-cols-1 gap-8 md:grid-cols-2">
+          <Tile
+            icon={<Cpu size={24} />}
+            title={d.s4.left.title}
+            body={d.s4.left.body}
+            onTitle={(v) => set({ ...d, s4: { ...d.s4, left: { ...d.s4.left, title: v } } })}
+            onBody={(v) => set({ ...d, s4: { ...d.s4, left: { ...d.s4.left, body: v } } })}
+          />
+          <Tile
+            icon={<Cloud size={24} />}
+            title={d.s4.right.title}
+            body={d.s4.right.body}
+            onTitle={(v) => set({ ...d, s4: { ...d.s4, right: { ...d.s4.right, title: v } } })}
+            onBody={(v) => set({ ...d, s4: { ...d.s4, right: { ...d.s4.right, body: v } } })}
+          />
+        </div>
+      </div>
+    </SlideShell>
+  );
+}
+
+function Slide5({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boolean }) {
+  return (
+    <SlideShell theme="dark">
+      <div className="flex h-full flex-col">
+        <div className="text-xs uppercase tracking-[0.4em]" style={{ color: GOLD, ...sans }}>
+          Prompt Architecture
+        </div>
+        <Editable
+          as="h2"
+          value={d.s5.heading}
+          onChange={(v) => set({ ...d, s5: { ...d.s5, heading: v } })}
+          editMode={edit}
+          className="mt-2 text-4xl md:text-5xl font-medium"
+          style={{ ...display, color: BEIGE }}
+        />
+        <div className="mt-10 grid flex-1 grid-cols-1 gap-8 md:grid-cols-2">
+          <div className="flex flex-col justify-center">
+            <Editable
+              value={d.s5.body}
+              onChange={(v) => set({ ...d, s5: { ...d.s5, body: v } })}
+              editMode={edit}
+              multiline
+              className="text-base md:text-lg leading-relaxed"
+              style={{ ...sans, color: "#d4c9af" }}
+            />
+            <div className="mt-6 flex flex-wrap gap-2">
+              {["Role-Grounded Personas", "Hard Boundary Constraints", "Ethical Safeguards"].map((t) => (
+                <span
+                  key={t}
+                  className="rounded-full px-3 py-1 text-xs"
+                  style={{ border: `1px solid ${GOLD}55`, color: GOLD, ...sans }}
+                >
+                  {t}
+                </span>
+              ))}
             </div>
-            <div className="flex items-center gap-3 md:gap-5 shrink-0">
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/15 border border-accent/40">
-                <ShieldCheck className="h-3.5 w-3.5 text-accent" />
-                <span className="text-[11px] font-medium tracking-wide text-primary uppercase">
-                  Responsible AI
+          </div>
+          <div
+            className="relative overflow-hidden rounded-md"
+            style={{ background: "#0f1626", border: `1px solid ${GOLD}44`, boxShadow: `0 30px 60px -30px ${GOLD}33` }}
+          >
+            <div className="flex items-center gap-2 border-b px-4 py-2" style={{ borderColor: `${GOLD}33` }}>
+              <span className="h-2 w-2 rounded-full" style={{ background: "#ff5f56" }} />
+              <span className="h-2 w-2 rounded-full" style={{ background: GOLD }} />
+              <span className="h-2 w-2 rounded-full" style={{ background: "#27c93f" }} />
+              <span className="ml-3 text-[10px] uppercase tracking-[0.3em]" style={{ color: GOLD, ...sans }}>
+                system.prompt.matrix
+              </span>
+            </div>
+            <Editable
+              as="pre"
+              value={d.s5.code}
+              onChange={(v) => set({ ...d, s5: { ...d.s5, code: v } })}
+              editMode={edit}
+              multiline
+              className="overflow-auto p-5 text-xs leading-relaxed whitespace-pre"
+              style={{ ...mono, color: BEIGE }}
+            />
+          </div>
+        </div>
+      </div>
+    </SlideShell>
+  );
+}
+
+function Slide6({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boolean }) {
+  return (
+    <SlideShell theme="light">
+      <div className="flex h-full flex-col">
+        <div className="text-xs uppercase tracking-[0.4em]" style={{ color: GOLD, ...sans }}>
+          Engineering Story
+        </div>
+        <Editable
+          as="h2"
+          value={d.s6.heading}
+          onChange={(v) => set({ ...d, s6: { ...d.s6, heading: v } })}
+          editMode={edit}
+          className="mt-2 text-4xl md:text-5xl font-medium"
+          style={{ ...display, color: NAVY }}
+        />
+        <div className="mt-10 grid flex-1 grid-cols-1 gap-8 md:grid-cols-2">
+          <div className="rounded-lg bg-white p-8" style={{ border: `1px solid ${GOLD}55` }}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2" style={{ color: NAVY }}>
+                <AlertTriangle size={20} style={{ color: "#b3261e" }} />
+                <span className="text-sm uppercase tracking-[0.3em]" style={sans}>Challenge</span>
+              </div>
+              <span
+                className="rounded-full px-2 py-0.5 text-[10px] uppercase"
+                style={{ background: "#b3261e", color: "#fff", ...sans }}
+              >
+                CVE Alert
+              </span>
+            </div>
+            <Editable
+              value={d.s6.challenge}
+              onChange={(v) => set({ ...d, s6: { ...d.s6, challenge: v } })}
+              editMode={edit}
+              multiline
+              className="mt-5 text-base leading-relaxed"
+              style={{ ...sans, color: NAVY }}
+            />
+            <pre
+              className="mt-5 overflow-auto rounded p-3 text-xs"
+              style={{ ...mono, background: "#fbf3e4", color: NAVY, border: `1px dashed ${GOLD}` }}
+            >{`! @tanstack/react-start  vulnerable
+! undici (transitive)    advisory`}</pre>
+          </div>
+          <div className="rounded-lg p-8" style={{ background: NAVY, border: `1px solid ${GOLD}55`, color: BEIGE }}>
+            <div className="flex items-center gap-2" style={{ color: GOLD }}>
+              <ShieldCheck size={20} />
+              <span className="text-sm uppercase tracking-[0.3em]" style={sans}>Resolution</span>
+            </div>
+            <Editable
+              value={d.s6.resolution}
+              onChange={(v) => set({ ...d, s6: { ...d.s6, resolution: v } })}
+              editMode={edit}
+              multiline
+              className="mt-5 text-base leading-relaxed"
+              style={{ ...sans, color: "#dcd2ba" }}
+            />
+            <div
+              className="mt-5 overflow-hidden rounded"
+              style={{ background: "#0f1626", border: `1px solid ${GOLD}33` }}
+            >
+              <div className="flex items-center gap-2 px-3 py-1.5" style={{ borderBottom: `1px solid ${GOLD}22` }}>
+                <TerminalSquare size={14} style={{ color: GOLD }} />
+                <span className="text-[10px] uppercase tracking-[0.3em]" style={{ ...sans, color: GOLD }}>
+                  lovable › terminal
                 </span>
               </div>
-              <div className="h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-serif text-sm shadow-[var(--shadow-luxury)]">
-                RA
-              </div>
+              <pre className="overflow-auto p-3 text-xs" style={{ ...mono, color: BEIGE }}>{`$ bun update --latest @tanstack/react-start
+✔ aligned router-core 1.171.13
+✔ undici advisory cleared
+✔ lockfile committed`}</pre>
             </div>
           </div>
-
-          {/* Mobile nav */}
-          <div className="md:hidden px-4 pb-3 flex gap-2 overflow-x-auto">
-            {NAV.map(({ key, label, icon: Icon }) => (
-              <button
-                key={key}
-                onClick={() => setView(key)}
-                className={`shrink-0 flex items-center gap-2 px-3 py-2 rounded-full text-xs font-serif border
-                  ${view === key ? "bg-primary text-primary-foreground border-primary" : "bg-card text-primary border-border"}`}
-              >
-                <Icon className="h-3.5 w-3.5" />
-                {label}
-              </button>
-            ))}
-          </div>
-        </header>
-
-        {/* Content */}
-        <main className="flex-1 px-6 md:px-10 py-8 md:py-10">
-          {view === "email" && <EmailModule />}
-          {view === "notes" && <NotesModule />}
-          {view === "planner" && <PlannerModule />}
-          {view === "research" && <ResearchModule />}
-          {view === "chat" && <ChatModule />}
-        </main>
-
-        {/* Footer disclaimer */}
-        <footer className="border-t border-border/60 bg-secondary/40">
-          <div className="px-6 md:px-10 py-5 text-center">
-            <p className="font-serif italic text-sm md:text-[15px] text-primary/85 max-w-3xl mx-auto leading-relaxed">
-              <ShieldCheck className="inline-block h-4 w-4 text-accent mr-2 -mt-0.5" />
-              AI-generated content can contain inaccuracies. Please review, verify, and edit all outputs before professional use.
-            </p>
-          </div>
-        </footer>
+        </div>
       </div>
-    </div>
+    </SlideShell>
   );
 }
 
-/* ============== Shared primitives ============== */
+function Slide7({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boolean }) {
+  const [draftUrl, setDraftUrl] = useState(d.s7.mediaUrl);
+  const [playing, setPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const url = d.s7.mediaUrl.trim();
 
-function ModuleHeader({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
-  return (
-    <div className="mb-8 max-w-3xl">
-      <p className="text-[11px] uppercase tracking-[0.25em] text-accent font-medium mb-3">{eyebrow}</p>
-      <h2 className="font-serif text-3xl md:text-4xl text-primary leading-tight">{title}</h2>
-      <p className="text-sm md:text-base text-muted-foreground mt-3 leading-relaxed">{description}</p>
-    </div>
-  );
-}
+  const isIframe = /^<iframe[\s\S]+<\/iframe>$/i.test(url);
+  const isImage = /\.(gif|png|jpe?g|webp)$/i.test(url);
+  const isVideo = /\.(mp4|webm|mov)$/i.test(url);
+  const isYouTube = /youtube\.com|youtu\.be/.test(url);
 
-function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`bg-card rounded-xl border border-border/70 shadow-[var(--shadow-luxury)] ${className}`}>
-      {children}
-    </div>
-  );
-}
-
-function PrimaryButton({ children, onClick, disabled, className = "" }: { children: React.ReactNode; onClick?: () => void; disabled?: boolean; className?: string }) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`inline-flex items-center gap-2 px-6 py-3 rounded-md bg-primary text-primary-foreground font-serif text-[15px]
-        hover:bg-[color:var(--navy-soft)] transition-colors shadow-[var(--shadow-luxury)] disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
-    >
-      {children}
-    </button>
-  );
-}
-
-function Label({ children }: { children: React.ReactNode }) {
-  return <label className="block text-[11px] uppercase tracking-[0.18em] text-primary/70 font-medium mb-2">{children}</label>;
-}
-
-const inputCls =
-  "w-full px-4 py-3 rounded-md border border-border bg-card text-primary placeholder:text-muted-foreground/70 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition";
-
-/* ============== 1. Smart Email Generator ============== */
-
-function EmailModule() {
-  const [topic, setTopic] = useState("");
-  const [tone, setTone] = useState<"Formal" | "Friendly" | "Persuasive">("Formal");
-  const [output, setOutput] = useState("");
-  const [copied, setCopied] = useState(false);
-
-  const generate = () => {
-    if (!topic.trim()) return;
-    const greetings = { Formal: "Dear Colleague,", Friendly: "Hi there,", Persuasive: "Hello," };
-    const closings = {
-      Formal: "Kindly let me know your thoughts at your earliest convenience.\n\nWarm regards,\nRebecca Adams",
-      Friendly: "Let me know what you think — would love to hear from you soon!\n\nCheers,\nRebecca Adams",
-      Persuasive: "I'm confident this represents a meaningful opportunity, and I'd welcome the chance to discuss it further.\n\nSincerely,\nRebecca Adams",
-    };
-    const bodies = {
-      Formal: `I hope this message finds you well. I am writing to discuss ${topic}. Based on recent developments, I believe this matter warrants our shared attention and a coordinated response.`,
-      Friendly: `Hope you're having a great week! I wanted to reach out about ${topic} — I think it's something we should chat about. It could be a really good fit for what we're working on.`,
-      Persuasive: `I wanted to bring to your attention an important matter: ${topic}. The case for moving forward is compelling, both in terms of impact and timing, and I'd love your support in taking the next step.`,
-    };
-    setOutput(`${greetings[tone]}\n\n${bodies[tone]}\n\n${closings[tone]}`);
-    setCopied(false);
-  };
-
-  const copy = async () => {
-    await navigator.clipboard.writeText(output);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
+  const togglePlay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) {
+      v.play();
+      setPlaying(true);
+    } else {
+      v.pause();
+      setPlaying(false);
+    }
   };
 
   return (
-    <div>
-      <ModuleHeader
-        eyebrow="Module 01"
-        title="Smart Email Generator"
-        description="Compose pitch-perfect correspondence in seconds. Choose your tone — we'll handle the elegance."
-      />
-      <div className="grid lg:grid-cols-2 gap-6">
-        <Card className="p-6 md:p-8">
-          <Label>Topic / Context</Label>
-          <textarea
-            rows={5}
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            placeholder="e.g. Following up on the Q4 partnership proposal with Maison Bellême..."
-            className={inputCls + " resize-none mb-5"}
-          />
-          <Label>Tone</Label>
-          <div className="relative mb-6">
-            <select
-              value={tone}
-              onChange={(e) => setTone(e.target.value as "Formal" | "Friendly" | "Persuasive")}
-              className={inputCls + " appearance-none pr-10 cursor-pointer"}
-            >
-              <option>Formal</option>
-              <option>Friendly</option>
-              <option>Persuasive</option>
-            </select>
-            <ArrowRight className="h-4 w-4 absolute right-4 top-1/2 -translate-y-1/2 rotate-90 text-accent pointer-events-none" />
-          </div>
-          <PrimaryButton onClick={generate}>
-            <Sparkles className="h-4 w-4" /> Generate Email
-          </PrimaryButton>
-        </Card>
-
-        <Card className="p-6 md:p-8 flex flex-col">
-          <div className="flex items-center justify-between mb-4">
-            <p className="font-serif text-xl text-primary">Draft</p>
-            {output && (
-              <button
-                onClick={copy}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-accent text-primary text-xs uppercase tracking-wider font-medium hover:bg-[color:var(--gold-soft)] transition shadow-[var(--shadow-gold)]"
-              >
-                {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                {copied ? "Copied" : "Copy"}
-              </button>
-            )}
-          </div>
-          <textarea
-            value={output}
-            onChange={(e) => setOutput(e.target.value)}
-            placeholder="Your composed message will appear here..."
-            rows={14}
-            className={inputCls + " flex-1 resize-none font-serif text-[15px] leading-relaxed bg-secondary/40"}
-          />
-        </Card>
-      </div>
-    </div>
-  );
-}
-
-/* ============== 2. Meeting Notes Summarizer ============== */
-
-function NotesModule() {
-  const [notes, setNotes] = useState("");
-  const [result, setResult] = useState<null | { summary: string; actions: string[]; decisions: string[] }>(null);
-
-  const summarize = () => {
-    if (!notes.trim()) return;
-    const wc = notes.split(/\s+/).length;
-    setResult({
-      summary: `The meeting covered ${wc} words of discussion centered on strategic priorities, cross-functional alignment, and upcoming deliverables. Stakeholders agreed on accelerated timelines and clarified ownership for the next sprint cycle.`,
-      actions: [
-        "Rebecca Adams to circulate revised proposal by Friday, EOD",
-        "Marketing team to deliver creative brief within 5 business days",
-        "Schedule follow-up review session for next Tuesday at 10:00 AM",
-        "Finance to validate Q4 budget allocation by month-end",
-      ],
-      decisions: [
-        "Approved rollout of the Atelier brand refresh in EMEA markets",
-        "Confirmed shift to quarterly OKR cadence beginning Q1",
-        "Greenlit partnership exploration with two flagship vendors",
-      ],
-    });
-  };
-
-  return (
-    <div>
-      <ModuleHeader
-        eyebrow="Module 02"
-        title="Meeting Notes Summarizer"
-        description="Distill long conversations into clear, actionable intelligence — structured for executive review."
-      />
-      <Card className="p-6 md:p-8 mb-6">
-        <Label>Raw Meeting Notes</Label>
-        <textarea
-          rows={9}
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="Paste your meeting transcript or notes here..."
-          className={inputCls + " resize-none mb-5"}
+    <SlideShell theme="dark">
+      <div className="flex h-full flex-col">
+        <div className="text-xs uppercase tracking-[0.4em]" style={{ color: GOLD, ...sans }}>
+          Demonstration
+        </div>
+        <Editable
+          as="h2"
+          value={d.s7.heading}
+          onChange={(v) => set({ ...d, s7: { ...d.s7, heading: v } })}
+          editMode={edit}
+          className="mt-2 text-4xl md:text-5xl font-medium"
+          style={{ ...display, color: BEIGE }}
         />
-        <PrimaryButton onClick={summarize}>
-          <FileText className="h-4 w-4" /> Summarize Notes
-        </PrimaryButton>
-      </Card>
-
-      {result && (
-        <div className="grid md:grid-cols-3 gap-5">
-          <SummaryCard title="Executive Summary">
-            <p className="text-sm leading-relaxed text-primary/85">{result.summary}</p>
-          </SummaryCard>
-          <SummaryCard title="Action Items & Deadlines">
-            <ul className="space-y-3">
-              {result.actions.map((a, i) => (
-                <li key={i} className="flex gap-3 text-sm text-primary/85">
-                  <span className="text-accent font-serif text-lg leading-none">·</span>
-                  <span>{a}</span>
-                </li>
-              ))}
-            </ul>
-          </SummaryCard>
-          <SummaryCard title="Key Decisions">
-            <ul className="space-y-3">
-              {result.decisions.map((d, i) => (
-                <li key={i} className="flex gap-3 text-sm text-primary/85">
-                  <Check className="h-4 w-4 text-accent shrink-0 mt-0.5" />
-                  <span>{d}</span>
-                </li>
-              ))}
-            </ul>
-          </SummaryCard>
+        <div className="mt-8 flex flex-1 items-center justify-center">
+          <div
+            className="w-full max-w-4xl overflow-hidden rounded-lg"
+            style={{ background: "#0f1626", border: `1px solid ${GOLD}55`, boxShadow: `0 40px 80px -30px ${GOLD}44` }}
+          >
+            <div className="flex items-center gap-2 border-b px-4 py-2.5" style={{ borderColor: `${GOLD}33` }}>
+              <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#ff5f56" }} />
+              <span className="h-2.5 w-2.5 rounded-full" style={{ background: GOLD }} />
+              <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#27c93f" }} />
+              <div
+                className="ml-4 flex-1 truncate rounded px-3 py-1 text-xs"
+                style={{ background: "#1a2236", color: BEIGE, ...sans }}
+              >
+                atelier-ai.lovable.app/demo
+              </div>
+            </div>
+            <div className="relative" style={{ aspectRatio: "16 / 9", background: NAVY }}>
+              {!url && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
+                  <span className="text-sm" style={{ ...sans, color: "#d4c9af", opacity: 0.7 }}>
+                    Paste a video URL, GIF link, or full &lt;iframe&gt; embed below.
+                  </span>
+                </div>
+              )}
+              {url && isIframe && (
+                <div className="absolute inset-0 [&>iframe]:h-full [&>iframe]:w-full" dangerouslySetInnerHTML={{ __html: url }} />
+              )}
+              {url && isYouTube && !isIframe && (
+                <iframe
+                  className="absolute inset-0 h-full w-full"
+                  src={url.replace("watch?v=", "embed/")}
+                  title="Demo"
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                />
+              )}
+              {url && isImage && <img src={url} alt="Demo" className="absolute inset-0 h-full w-full object-cover" />}
+              {url && isVideo && (
+                <video ref={videoRef} src={url} className="absolute inset-0 h-full w-full object-cover" />
+              )}
+              {url && !isIframe && !isYouTube && !isImage && !isVideo && (
+                <iframe className="absolute inset-0 h-full w-full" src={url} title="Demo" />
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-3 border-t px-4 py-3" style={{ borderColor: `${GOLD}33` }}>
+              {isVideo && (
+                <button
+                  onClick={togglePlay}
+                  className="flex items-center gap-2 rounded-full px-4 py-1.5 text-xs"
+                  style={{ background: GOLD, color: NAVY, ...sans }}
+                >
+                  {playing ? <Pause size={14} /> : <Play size={14} />}
+                  {playing ? "Pause" : "Play"}
+                </button>
+              )}
+              <input
+                value={draftUrl}
+                onChange={(e) => setDraftUrl(e.target.value)}
+                onKeyDown={(e) => e.stopPropagation()}
+                placeholder="https://… or paste <iframe …></iframe>"
+                className="flex-1 rounded px-3 py-1.5 text-xs outline-none"
+                style={{ background: "#1a2236", color: BEIGE, border: `1px solid ${GOLD}33`, ...sans }}
+              />
+              <button
+                onClick={() => set({ ...d, s7: { ...d.s7, mediaUrl: draftUrl } })}
+                className="rounded-full px-4 py-1.5 text-xs"
+                style={{ border: `1px solid ${GOLD}`, color: GOLD, ...sans }}
+              >
+                Load
+              </button>
+            </div>
+          </div>
         </div>
-      )}
-    </div>
-  );
-}
-
-function SummaryCard({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="bg-card rounded-xl border border-accent/50 shadow-[var(--shadow-luxury)] overflow-hidden">
-      <div className="px-6 py-4 border-b border-accent/30 bg-accent/5">
-        <h3 className="font-serif text-lg text-primary">{title}</h3>
       </div>
-      <div className="p-6">{children}</div>
-    </div>
+    </SlideShell>
   );
 }
 
-/* ============== 3. AI Task Planner ============== */
-
-function PlannerModule() {
-  const [raw, setRaw] = useState("");
-  const [schedule, setSchedule] = useState<{ time: string; task: string; priority: "High" | "Medium" | "Low" }[] | null>(null);
-
-  const structure = () => {
-    const items = raw.split("\n").map((t) => t.trim()).filter(Boolean);
-    if (!items.length) return;
-    const times = ["09:00 AM", "10:30 AM", "11:45 AM", "01:30 PM", "03:00 PM", "04:15 PM", "05:30 PM"];
-    const prios: ("High" | "Medium" | "Low")[] = ["High", "High", "Medium", "High", "Medium", "Low", "Low"];
-    setSchedule(
-      items.slice(0, 7).map((task, i) => ({
-        time: times[i] ?? "06:00 PM",
-        task,
-        priority: prios[i] ?? "Low",
-      }))
-    );
-  };
-
-  const pillCls = (p: "High" | "Medium" | "Low") =>
-    p === "High"
-      ? "bg-primary text-primary-foreground"
-      : p === "Medium"
-      ? "bg-accent/80 text-primary"
-      : "bg-secondary text-primary/70";
-
+function Slide8({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boolean }) {
   return (
-    <div>
-      <ModuleHeader
-        eyebrow="Module 03"
-        title="AI Task Planner"
-        description="Transform a scattered list into a refined, chronological agenda — purpose-built for a productive day."
-      />
-      <Card className="p-6 md:p-8 mb-6">
-        <Label>Today's Tasks (one per line)</Label>
-        <textarea
-          rows={7}
-          value={raw}
-          onChange={(e) => setRaw(e.target.value)}
-          placeholder={"Review Q4 board deck\nCall with Antoine re: contract\nWrite team update\n..."}
-          className={inputCls + " resize-none mb-5 font-mono text-sm"}
-        />
-        <PrimaryButton onClick={structure}>
-          <CalendarClock className="h-4 w-4" /> Structure My Day
-        </PrimaryButton>
-      </Card>
-
-      {schedule && (
-        <Card className="overflow-hidden">
-          <div className="px-6 py-4 border-b border-border bg-secondary/40 flex items-center justify-between">
-            <h3 className="font-serif text-xl text-primary">Today's Itinerary</h3>
-            <span className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{schedule.length} items</span>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="text-left text-[11px] uppercase tracking-[0.18em] text-muted-foreground border-b border-border">
-                  <th className="px-6 py-3 font-medium w-40">Time</th>
-                  <th className="px-6 py-3 font-medium">Task</th>
-                  <th className="px-6 py-3 font-medium w-36">Priority</th>
-                </tr>
-              </thead>
-              <tbody>
-                {schedule.map((row, i) => (
-                  <tr key={i} className="border-b border-border/60 last:border-0 hover:bg-secondary/30 transition">
-                    <td className="px-6 py-4 font-serif text-primary flex items-center gap-2">
-                      <Clock className="h-3.5 w-3.5 text-accent" /> {row.time}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-primary/85">{row.task}</td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex px-3 py-1 rounded-full text-[11px] uppercase tracking-wider font-medium ${pillCls(row.priority)}`}>
-                        {row.priority}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      )}
-    </div>
-  );
-}
-
-/* ============== 4. Research Assistant ============== */
-
-function ResearchModule() {
-  const [topic, setTopic] = useState("");
-  const [result, setResult] = useState<null | { points: string[]; recs: string[] }>(null);
-
-  const analyze = () => {
-    if (!topic.trim()) return;
-    setResult({
-      points: [
-        `${topic} is experiencing accelerated momentum across leading enterprise markets.`,
-        "Adoption is being driven by demand for measurable efficiency and refined user experience.",
-        "Regulatory frameworks are evolving rapidly — early movers gain meaningful strategic advantage.",
-        "Competitive landscape consolidation is anticipated within the next 12 to 18 months.",
-      ],
-      recs: [
-        "Establish a dedicated initiative with clear ownership and quarterly milestones.",
-        "Invest in foundational capabilities before pursuing breadth of application.",
-        "Pilot in a contained business unit to validate assumptions before scale.",
-        "Build advisory relationships with two to three domain experts for ongoing perspective.",
-      ],
-    });
-  };
-
-  return (
-    <div>
-      <ModuleHeader
-        eyebrow="Module 04"
-        title="Research Assistant"
-        description="Move from question to insight — structured analysis and recommendations, ready for the boardroom."
-      />
-      <Card className="p-6 md:p-8 mb-6">
-        <Label>Topic or Article Subject</Label>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <input
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            placeholder="e.g. The rise of agentic AI in financial services"
-            className={inputCls + " flex-1"}
+    <SlideShell theme="dark">
+      <div className="relative flex h-full flex-col items-center justify-center text-center">
+        <svg className="pointer-events-none absolute inset-0 m-auto h-[80%] w-[80%] opacity-30" viewBox="0 0 400 400">
+          <g fill="none" stroke={GOLD} strokeWidth="1.2">
+            <circle cx="200" cy="200" r="60" />
+            <circle cx="200" cy="200" r="100" opacity="0.7" />
+            <circle cx="200" cy="200" r="140" opacity="0.5" />
+            <circle cx="200" cy="200" r="180" opacity="0.3" />
+            <path d="M40,200 C120,140 280,260 360,200" />
+            <path d="M40,220 C120,160 280,280 360,220" opacity="0.6" />
+          </g>
+        </svg>
+        <div className="relative">
+          <Editable
+            as="h1"
+            value={d.s8.thanks}
+            onChange={(v) => set({ ...d, s8: { ...d.s8, thanks: v } })}
+            editMode={edit}
+            className="text-6xl md:text-8xl font-medium"
+            style={{ ...serif, color: BEIGE, letterSpacing: "0.12em" }}
           />
-          <PrimaryButton onClick={analyze} className="shrink-0">
-            <Search className="h-4 w-4" /> Research & Analyze
-          </PrimaryButton>
+          <div className="my-6 mx-auto h-px w-32" style={{ background: GOLD }} />
+          <Editable
+            as="div"
+            value={d.s8.name}
+            onChange={(v) => set({ ...d, s8: { ...d.s8, name: v } })}
+            editMode={edit}
+            className="text-2xl italic"
+            style={{ ...display, color: GOLD }}
+          />
+          <Editable
+            value={d.s8.contact}
+            onChange={(v) => set({ ...d, s8: { ...d.s8, contact: v } })}
+            editMode={edit}
+            className="mt-3 text-sm tracking-[0.25em] uppercase"
+            style={{ ...sans, color: "#d4c9af" }}
+          />
         </div>
-      </Card>
-
-      {result && (
-        <div className="grid md:grid-cols-2 gap-5">
-          <SummaryCard title="Key Summary Points">
-            <ul className="space-y-3">
-              {result.points.map((p, i) => (
-                <li key={i} className="flex gap-3 text-sm text-primary/85">
-                  <span className="font-serif text-accent text-sm mt-0.5">0{i + 1}</span>
-                  <span>{p}</span>
-                </li>
-              ))}
-            </ul>
-          </SummaryCard>
-          <SummaryCard title="Strategic Recommendations">
-            <ul className="space-y-3">
-              {result.recs.map((r, i) => (
-                <li key={i} className="flex gap-3 text-sm text-primary/85">
-                  <ArrowRight className="h-4 w-4 text-accent shrink-0 mt-0.5" />
-                  <span>{r}</span>
-                </li>
-              ))}
-            </ul>
-          </SummaryCard>
-        </div>
-      )}
-    </div>
+      </div>
+    </SlideShell>
   );
 }
 
-/* ============== 5. Chatbot ============== */
+/* ---------- Page ---------- */
+const TOTAL = 8;
 
-type Msg = { role: "user" | "ai"; text: string };
+function DeckPage() {
+  const [deck, setDeck] = useState<Deck>(DEFAULT_DECK);
+  const [index, setIndex] = useState(0);
+  const [edit, setEdit] = useState(false);
+  const [fs, setFs] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-const QUICK = ["Summarize my inbox", "Draft a thank-you note", "Plan a focus block", "Suggest a meeting agenda"];
-
-function ChatModule() {
-  const [messages, setMessages] = useState<Msg[]>([
-    { role: "ai", text: "Good day, Rebecca Adams. I'm Atelier — your discreet workplace assistant. How may I be of service?" },
-  ]);
-  const [input, setInput] = useState("");
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const go = useCallback((n: number) => setIndex((i) => Math.max(0, Math.min(TOTAL - 1, n))), []);
+  const next = useCallback(() => go(index + 1), [go, index]);
+  const prev = useCallback(() => go(index - 1), [go, index]);
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages]);
+    const onKey = (e: KeyboardEvent) => {
+      if (edit) return;
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      if (e.key === "ArrowRight" || e.key === " ") next();
+      if (e.key === "ArrowLeft") prev();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [next, prev, edit]);
 
-  const send = (text: string) => {
-    const t = text.trim();
-    if (!t) return;
-    setMessages((m) => [...m, { role: "user", text: t }]);
-    setInput("");
-    setTimeout(() => {
-      setMessages((m) => [
-        ...m,
-        {
-          role: "ai",
-          text: `A thoughtful question. Regarding "${t}" — here's how I'd approach it: begin with the outcome you wish to achieve, then work backwards through the two or three decisions that will most influence it. I can draft, schedule, or research as needed — simply ask.`,
-        },
-      ]);
-    }, 600);
+  useEffect(() => {
+    const onFs = () => setFs(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
+  }, []);
+
+  const toggleFs = () => {
+    if (!document.fullscreenElement) containerRef.current?.requestFullscreen?.();
+    else document.exitFullscreen?.();
   };
 
+  const slides = [
+    <Slide1 key={0} d={deck} set={setDeck} edit={edit} />,
+    <Slide2 key={1} d={deck} set={setDeck} edit={edit} />,
+    <Slide3 key={2} d={deck} set={setDeck} edit={edit} />,
+    <Slide4 key={3} d={deck} set={setDeck} edit={edit} />,
+    <Slide5 key={4} d={deck} set={setDeck} edit={edit} />,
+    <Slide6 key={5} d={deck} set={setDeck} edit={edit} />,
+    <Slide7 key={6} d={deck} set={setDeck} edit={edit} />,
+    <Slide8 key={7} d={deck} set={setDeck} edit={edit} />,
+  ];
+
   return (
-    <div>
-      <ModuleHeader
-        eyebrow="Module 05"
-        title="AI Concierge"
-        description="A conversational partner for every moment of the working day — composed, considered, and always available."
-      />
-      <Card className="flex flex-col h-[68vh] min-h-[520px] overflow-hidden">
-        <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 md:px-8 py-6 space-y-4 bg-secondary/20">
-          {messages.map((m, i) => (
-            <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div
-                className={`max-w-[78%] px-5 py-3.5 rounded-2xl text-[15px] leading-relaxed shadow-sm
-                  ${m.role === "user"
-                    ? "bg-primary text-primary-foreground rounded-br-sm"
-                    : "bg-secondary text-primary rounded-bl-sm font-serif"}`}
-              >
-                {m.text}
-              </div>
+    <div ref={containerRef} className="flex h-screen w-screen flex-col" style={{ background: "#0a0f1c" }}>
+      <div className="relative flex-1 overflow-hidden">
+        <div
+          className="flex h-full transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+          style={{ width: `${TOTAL * 100}%`, transform: `translateX(-${index * (100 / TOTAL)}%)` }}
+        >
+          {slides.map((s, i) => (
+            <div
+              key={i}
+              className="h-full"
+              style={{ width: `${100 / TOTAL}%`, opacity: i === index ? 1 : 0.4, transition: "opacity 0.6s" }}
+            >
+              {s}
             </div>
           ))}
         </div>
+      </div>
 
-        <div className="px-5 md:px-8 pt-4 pb-3 flex flex-wrap gap-2 border-t border-border/60 bg-card">
-          {QUICK.map((q) => (
-            <button
-              key={q}
-              onClick={() => send(q)}
-              className="px-3.5 py-1.5 rounded-full bg-accent/15 border border-accent/40 text-xs text-primary hover:bg-accent/25 transition font-medium"
-            >
-              {q}
-            </button>
-          ))}
+      {/* Control bar */}
+      <div
+        className="flex items-center justify-between gap-4 border-t px-6 py-3"
+        style={{ background: NAVY, borderColor: `${GOLD}33`, color: BEIGE }}
+      >
+        <div className="flex items-center gap-2 text-xs tracking-[0.3em] uppercase" style={{ ...sans, color: GOLD }}>
+          <Sparkles size={14} />
+          Atelier AI
         </div>
 
-        <form
-          onSubmit={(e) => { e.preventDefault(); send(input); }}
-          className="px-5 md:px-8 pb-5 flex gap-3 bg-card"
-        >
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
-            className={inputCls + " flex-1"}
-          />
+        <div className="flex items-center gap-3">
           <button
-            type="submit"
-            className="shrink-0 h-12 w-12 grid place-items-center rounded-md bg-primary text-primary-foreground hover:bg-[color:var(--navy-soft)] transition shadow-[var(--shadow-luxury)]"
-            aria-label="Send"
+            onClick={prev}
+            disabled={index === 0}
+            className="flex h-9 w-9 items-center justify-center rounded-full transition disabled:opacity-30"
+            style={{ border: `1px solid ${GOLD}55`, color: BEIGE }}
+            aria-label="Previous"
           >
-            <Send className="h-4 w-4" />
+            <ChevronLeft size={18} />
           </button>
-        </form>
-      </Card>
+          <div className="min-w-[110px] text-center text-xs tracking-[0.25em] uppercase" style={{ ...sans, color: BEIGE }}>
+            Slide <span style={{ color: GOLD }}>{index + 1}</span> of {TOTAL}
+          </div>
+          <button
+            onClick={next}
+            disabled={index === TOTAL - 1}
+            className="flex h-9 w-9 items-center justify-center rounded-full transition disabled:opacity-30"
+            style={{ border: `1px solid ${GOLD}55`, color: BEIGE }}
+            aria-label="Next"
+          >
+            <ChevronRight size={18} />
+          </button>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setEdit((v) => !v)}
+            className="flex items-center gap-2 rounded-full px-3 py-1.5 text-xs transition"
+            style={{
+              background: edit ? GOLD : "transparent",
+              color: edit ? NAVY : BEIGE,
+              border: `1px solid ${GOLD}`,
+              ...sans,
+            }}
+            aria-label="Toggle edit mode"
+          >
+            {edit ? <Pencil size={14} /> : <Eye size={14} />}
+            {edit ? "Edit Mode" : "View Mode"}
+          </button>
+          <button
+            onClick={toggleFs}
+            className="flex h-9 w-9 items-center justify-center rounded-full"
+            style={{ border: `1px solid ${GOLD}55`, color: BEIGE }}
+            aria-label="Toggle fullscreen"
+          >
+            {fs ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
