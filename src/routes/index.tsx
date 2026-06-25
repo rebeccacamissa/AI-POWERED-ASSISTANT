@@ -132,6 +132,7 @@ function Editable({
   multiline?: boolean;
 }) {
   const ref = useRef<HTMLElement | null>(null);
+  const AnyTag = Tag as unknown as React.ElementType;
 
   // Set text once when entering edit mode / value changes externally
   useEffect(() => {
@@ -141,13 +142,12 @@ function Editable({
   }, [value, editMode]);
 
   return (
-    <Tag
-      // @ts-expect-error ref polymorphic
+    <AnyTag
       ref={ref}
       contentEditable={editMode}
       suppressContentEditableWarning
-      onBlur={(e: React.FocusEvent<HTMLElement>) => onChange(e.currentTarget.innerText)}
-      onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => {
+      onBlur={(e: any) => onChange(e.currentTarget.innerText)}
+      onKeyDown={(e: any) => {
         if (!multiline && e.key === "Enter") {
           e.preventDefault();
           (e.currentTarget as HTMLElement).blur();
@@ -158,7 +158,7 @@ function Editable({
       style={{ ...style, outlineColor: editMode ? GOLD : undefined }}
     >
       {value}
-    </Tag>
+    </AnyTag>
   );
 }
 
