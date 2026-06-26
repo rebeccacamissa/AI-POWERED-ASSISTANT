@@ -761,27 +761,52 @@ function Slide6({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boole
 }
 
 function Slide7({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boolean }) {
-  const [draftUrl, setDraftUrl] = useState(d.s7.mediaUrl);
-  const [playing, setPlaying] = useState(false);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const url = d.s7.mediaUrl.trim();
+  const STORAGE_KEY = "atelier.s7.shots";
+  const SHOT_COUNT = 9;
+  const empty = useMemo(() => Array.from({ length: SHOT_COUNT }, () => ""), []);
+  const [shots, setShots] = useState<string[]>(empty);
+  const [active, setActive] = useState(0);
+  const [consoleOpen, setConsoleOpen] = useState(false);
 
-  const isIframe = /^<iframe[\s\S]+<\/iframe>$/i.test(url);
-  const isImage = /\.(gif|png|jpe?g|webp)$/i.test(url);
-  const isVideo = /\.(mp4|webm|mov)$/i.test(url);
-  const isYouTube = /youtube\.com|youtu\.be/.test(url);
+  // Load from localStorage on mount
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          const next = empty.map((_, i) => (typeof parsed[i] === "string" ? parsed[i] : ""));
+          setShots(next);
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [empty]);
 
-  const togglePlay = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    if (v.paused) {
-      v.play();
-      setPlaying(true);
-    } else {
-      v.pause();
-      setPlaying(false);
+  const persist = (next: string[]) => {
+    setShots(next);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      /* ignore */
     }
   };
+
+  const updateShot = (i: number, v: string) => {
+    const next = [...shots];
+    next[i] = v;
+    persist(next);
+  };
+
+  const clearAll = () => persist([...empty]);
+
+  const go = (n: number) => setActive((n + SHOT_COUNT) % SHOT_COUNT);
+  const next = () => go(active + 1);
+  const prev = () => go(active - 1);
+
+  const currentUrl = shots[active]?.trim() ?? "";
 
   return (
     <SlideShell theme="dark">
@@ -789,19 +814,33 @@ function Slide7({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boole
         <div className="text-xs uppercase tracking-[0.4em]" style={{ color: GOLD, ...sans }}>
           Demonstration
         </div>
-        <Editable
-          as="h2"
-          value={d.s7.heading}
-          onChange={(v) => set({ ...d, s7: { ...d.s7, heading: v } })}
-          editMode={edit}
-          className="mt-2 text-4xl md:text-5xl font-medium"
-          style={{ ...display, color: BEIGE }}
-        />
-        <div className="mt-8 flex flex-1 items-center justify-center">
+        <div className="flex items-center justify-between gap-4">
+          <Editable
+            as="h2"
+            value={d.s7.heading}
+            onChange={(v) => set({ ...d, s7: { ...d.s7, heading: v } })}
+            editMode={edit}
+            className="mt-2 text-4xl md:text-5xl font-medium"
+            style={{ ...display, color: BEIGE }}
+          />
+          {edit && (
+            <button
+              onClick={() => setConsoleOpen((v) => !v)}
+              className="flex items-center gap-2 rounded-full px-4 py-1.5 text-xs"
+              style={{ border: `1px solid ${GOLD}`, color: GOLD, ...sans }}
+            >
+              <TerminalSquare size={14} />
+              {consoleOpen ? "Hide Console" : "Open URL Console"}
+            </button>
+          )}
+        </div>
+
+        <div className="mt-6 flex flex-1 items-center justify-center">
           <div
             className="w-full max-w-4xl overflow-hidden rounded-lg"
             style={{ background: "#0f1626", border: `1px solid ${GOLD}55`, boxShadow: `0 40px 80px -30px ${GOLD}44` }}
           >
+            {/* Browser chrome */}
             <div className="flex items-center gap-2 border-b px-4 py-2.5" style={{ borderColor: `${GOLD}33` }}>
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#ff5f56" }} />
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: GOLD }} />
@@ -810,66 +849,124 @@ function Slide7({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boole
                 className="ml-4 flex-1 truncate rounded px-3 py-1 text-xs"
                 style={{ background: "#1a2236", color: BEIGE, ...sans }}
               >
-                atelier-ai.lovable.app/demo
+                atelier-ai.lovable.app/tour/{String(active + 1).padStart(2, "0")}
               </div>
+              <span
+                className="rounded-full px-2.5 py-0.5 text-[10px] tracking-[0.2em] uppercase"
+                style={{ background: `${GOLD}22`, color: GOLD, border: `1px solid ${GOLD}55`, ...sans }}
+              >
+                {active + 1} / {SHOT_COUNT}
+              </span>
             </div>
+
+            {/* Screenshot stage */}
             <div className="relative" style={{ aspectRatio: "16 / 9", background: NAVY }}>
-              {!url && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
+              {currentUrl ? (
+                <img
+                  src={currentUrl}
+                  alt={`Screenshot ${active + 1}`}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-6 text-center">
+                  <span className="text-xs uppercase tracking-[0.35em]" style={{ color: GOLD, ...sans }}>
+                    Screenshot {active + 1}
+                  </span>
                   <span className="text-sm" style={{ ...sans, color: "#d4c9af", opacity: 0.7 }}>
-                    Paste a video URL, GIF link, or full &lt;iframe&gt; embed below.
+                    No image yet — open Edit Mode and paste a direct image URL.
                   </span>
                 </div>
               )}
-              {url && isIframe && (
-                <div className="absolute inset-0 [&>iframe]:h-full [&>iframe]:w-full" dangerouslySetInnerHTML={{ __html: url }} />
-              )}
-              {url && isYouTube && !isIframe && (
-                <iframe
-                  className="absolute inset-0 h-full w-full"
-                  src={url.replace("watch?v=", "embed/")}
-                  title="Demo"
-                  allow="autoplay; encrypted-media"
-                  allowFullScreen
-                />
-              )}
-              {url && isImage && <img src={url} alt="Demo" className="absolute inset-0 h-full w-full object-cover" />}
-              {url && isVideo && (
-                <video ref={videoRef} src={url} className="absolute inset-0 h-full w-full object-cover" />
-              )}
-              {url && !isIframe && !isYouTube && !isImage && !isVideo && (
-                <iframe className="absolute inset-0 h-full w-full" src={url} title="Demo" />
-              )}
-            </div>
-            <div className="flex flex-wrap items-center gap-3 border-t px-4 py-3" style={{ borderColor: `${GOLD}33` }}>
-              {isVideo && (
-                <button
-                  onClick={togglePlay}
-                  className="flex items-center gap-2 rounded-full px-4 py-1.5 text-xs"
-                  style={{ background: GOLD, color: NAVY, ...sans }}
-                >
-                  {playing ? <Pause size={14} /> : <Play size={14} />}
-                  {playing ? "Pause" : "Play"}
-                </button>
-              )}
-              <input
-                value={draftUrl}
-                onChange={(e) => setDraftUrl(e.target.value)}
-                onKeyDown={(e) => e.stopPropagation()}
-                placeholder="https://… or paste <iframe …></iframe>"
-                className="flex-1 rounded px-3 py-1.5 text-xs outline-none"
-                style={{ background: "#1a2236", color: BEIGE, border: `1px solid ${GOLD}33`, ...sans }}
-              />
+
+              {/* Arrow controls */}
               <button
-                onClick={() => set({ ...d, s7: { ...d.s7, mediaUrl: draftUrl } })}
-                className="rounded-full px-4 py-1.5 text-xs"
-                style={{ border: `1px solid ${GOLD}`, color: GOLD, ...sans }}
+                onClick={prev}
+                aria-label="Previous screenshot"
+                className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full backdrop-blur transition hover:scale-105"
+                style={{ background: `${NAVY}cc`, border: `1px solid ${GOLD}88`, color: GOLD }}
               >
-                Load
+                <ChevronLeft size={20} />
               </button>
+              <button
+                onClick={next}
+                aria-label="Next screenshot"
+                className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full backdrop-blur transition hover:scale-105"
+                style={{ background: `${NAVY}cc`, border: `1px solid ${GOLD}88`, color: GOLD }}
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+
+            {/* Pagination dots */}
+            <div className="flex flex-wrap items-center justify-center gap-2 border-t px-4 py-3" style={{ borderColor: `${GOLD}33` }}>
+              {shots.map((s, i) => {
+                const isActive = i === active;
+                const hasImg = Boolean(s.trim());
+                return (
+                  <button
+                    key={i}
+                    onClick={() => go(i)}
+                    aria-label={`Go to screenshot ${i + 1}`}
+                    className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] transition"
+                    style={{
+                      background: isActive ? GOLD : "transparent",
+                      color: isActive ? NAVY : BEIGE,
+                      border: `1px solid ${hasImg ? GOLD : `${GOLD}55`}`,
+                      ...sans,
+                      fontWeight: isActive ? 600 : 400,
+                    }}
+                  >
+                    {i + 1}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
+
+        {/* Edit-mode console */}
+        {edit && consoleOpen && (
+          <div
+            className="mt-4 w-full max-w-4xl self-center rounded-lg p-4"
+            style={{ background: "#0a1124", border: `1px solid ${GOLD}55` }}
+          >
+            <div className="mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-2" style={{ color: GOLD }}>
+                <TerminalSquare size={14} />
+                <span className="text-[10px] uppercase tracking-[0.3em]" style={sans}>
+                  Screenshot URL Console · saved to localStorage
+                </span>
+              </div>
+              <button
+                onClick={clearAll}
+                className="rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.2em]"
+                style={{ border: `1px solid ${GOLD}55`, color: BEIGE, ...sans }}
+              >
+                Clear all
+              </button>
+            </div>
+            <div className="grid max-h-60 grid-cols-1 gap-2 overflow-auto pr-1 md:grid-cols-3">
+              {shots.map((s, i) => (
+                <label key={i} className="flex items-center gap-2">
+                  <span
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px]"
+                    style={{ background: `${GOLD}22`, color: GOLD, border: `1px solid ${GOLD}55`, ...sans }}
+                  >
+                    {i + 1}
+                  </span>
+                  <input
+                    value={s}
+                    onChange={(e) => updateShot(i, e.target.value)}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    placeholder="https://…/screenshot.png"
+                    className="flex-1 rounded px-2 py-1 text-[11px] outline-none"
+                    style={{ background: "#1a2236", color: BEIGE, border: `1px solid ${GOLD}33`, ...mono }}
+                  />
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </SlideShell>
   );
