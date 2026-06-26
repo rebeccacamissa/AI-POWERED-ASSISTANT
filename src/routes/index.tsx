@@ -113,6 +113,111 @@ function SwirlLight() {
   );
 }
 
+/* ---------- Starry Night vector art ---------- */
+function StarryNightArt() {
+  return (
+    <svg viewBox="0 0 300 380" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full">
+      <defs>
+        <radialGradient id="snSky" cx="50%" cy="40%" r="80%">
+          <stop offset="0%" stopColor="#2d3e6b" />
+          <stop offset="55%" stopColor={NAVY} />
+          <stop offset="100%" stopColor="#0f172a" />
+        </radialGradient>
+        <radialGradient id="snStar" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#fff8d6" stopOpacity="1" />
+          <stop offset="40%" stopColor={GOLD} stopOpacity="0.95" />
+          <stop offset="100%" stopColor={GOLD} stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="snMoon" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#fbe9a8" />
+          <stop offset="60%" stopColor={GOLD} stopOpacity="0.9" />
+          <stop offset="100%" stopColor={GOLD} stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id="snHill" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#1a2540" />
+          <stop offset="100%" stopColor="#0a1124" />
+        </linearGradient>
+      </defs>
+
+      {/* Sky */}
+      <rect width="300" height="380" fill="url(#snSky)" />
+
+      {/* Swirling brushstroke wind */}
+      <g fill="none" stroke={GOLD} strokeLinecap="round">
+        <path d="M-20,140 C40,80 110,200 170,140 C220,90 260,170 320,120" strokeWidth="2.2" opacity="0.85" />
+        <path d="M-20,160 C40,100 110,220 170,160 C220,110 260,190 320,140" strokeWidth="1.2" opacity="0.55" />
+        <path d="M-20,180 C40,120 110,240 170,180 C220,130 260,210 320,160" strokeWidth="0.8" opacity="0.35" />
+
+        {/* Central great swirl */}
+        <path d="M120,170 C150,150 190,170 190,200 C190,235 140,240 130,210 C123,188 150,180 165,195 C175,205 168,222 152,220" strokeWidth="1.8" opacity="0.9" />
+        <path d="M115,175 C150,145 200,170 200,205 C200,250 130,255 120,215" strokeWidth="1" opacity="0.55" />
+
+        {/* Secondary swirl */}
+        <path d="M30,90 C50,75 80,90 80,110 C80,130 50,135 45,118 C42,108 55,103 62,112" strokeWidth="1.4" opacity="0.8" />
+
+        {/* Distant wind streams */}
+        <path d="M-10,250 C60,210 140,270 220,230 C260,210 290,225 320,215" strokeWidth="1" opacity="0.5" />
+        <path d="M-10,270 C60,230 140,290 220,250 C260,230 290,245 320,235" strokeWidth="0.7" opacity="0.35" />
+      </g>
+
+      {/* Stars */}
+      <g>
+        <circle cx="60" cy="80" r="18" fill="url(#snStar)" />
+        <circle cx="60" cy="80" r="4" fill="#fff8d6" />
+        <circle cx="155" cy="200" r="22" fill="url(#snStar)" />
+        <circle cx="155" cy="200" r="5" fill="#fff8d6" />
+        <circle cx="230" cy="115" r="14" fill="url(#snStar)" />
+        <circle cx="230" cy="115" r="3" fill="#fff8d6" />
+        <circle cx="105" cy="55" r="10" fill="url(#snStar)" />
+        <circle cx="105" cy="55" r="2" fill="#fff8d6" />
+        <circle cx="200" cy="60" r="9" fill="url(#snStar)" />
+        <circle cx="200" cy="60" r="2" fill="#fff8d6" />
+        <circle cx="265" cy="180" r="11" fill="url(#snStar)" />
+        <circle cx="265" cy="180" r="2.5" fill="#fff8d6" />
+
+        {/* Crescent moon top right */}
+        <g>
+          <circle cx="260" cy="55" r="26" fill="url(#snMoon)" />
+          <circle cx="260" cy="55" r="11" fill="#fbe9a8" />
+          <circle cx="266" cy="52" r="9" fill={NAVY} opacity="0.85" />
+        </g>
+      </g>
+
+      {/* Rolling hill horizon */}
+      <path d="M0,300 C60,275 130,305 200,285 C250,272 280,295 300,290 L300,380 L0,380 Z" fill="url(#snHill)" />
+      <g fill="none" stroke={GOLD} strokeWidth="0.6" opacity="0.4">
+        <path d="M0,310 C60,288 130,315 200,295 C250,283 280,304 300,300" />
+        <path d="M0,325 C70,308 140,330 210,312 C260,300 285,318 300,316" opacity="0.7" />
+      </g>
+
+      {/* Village windows */}
+      <g fill={GOLD} opacity="0.9">
+        <rect x="170" y="285" width="2" height="3" />
+        <rect x="180" y="288" width="2" height="3" />
+        <rect x="195" y="287" width="2" height="3" />
+        <rect x="215" y="290" width="2" height="3" />
+      </g>
+
+      {/* Cypress silhouette on the left edge */}
+      <g>
+        <path
+          d="M55,380 C40,340 38,300 48,250 C40,220 50,180 42,140 C56,150 60,180 58,210 C70,200 75,230 68,260 C78,280 72,320 70,380 Z"
+          fill="#0a1020"
+          stroke={NAVY}
+          strokeWidth="0.5"
+        />
+        <path
+          d="M50,360 C44,330 46,300 52,270 M58,300 C56,280 62,260 60,240 M54,220 C52,200 58,180 56,160"
+          fill="none"
+          stroke={GOLD}
+          strokeOpacity="0.25"
+          strokeWidth="0.8"
+        />
+      </g>
+    </svg>
+  );
+}
+
 /* ---------- Editable primitive ---------- */
 function Editable({
   value,
