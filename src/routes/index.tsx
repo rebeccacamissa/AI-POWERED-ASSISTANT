@@ -817,7 +817,6 @@ function Slide7({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boole
   };
 
   const clearAll = () => persist([...empty]);
-  const resetDefaults = () => persist([...defaults]);
 
   const go = (n: number) => setActive((n + SHOT_COUNT) % SHOT_COUNT);
   const next = () => go(active + 1);
