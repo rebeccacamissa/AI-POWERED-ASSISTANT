@@ -763,8 +763,22 @@ function Slide6({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boole
 function Slide7({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boolean }) {
   const STORAGE_KEY = "atelier.s7.shots";
   const SHOT_COUNT = 9;
+  const defaults = useMemo(() => {
+    const formal = "https://i.postimg.cc/QFyKnwGc/FORMAL-EMAIL-TEST.png";
+    return [
+      formal,
+      "https://i.postimg.cc/Hrh8PRDz/FRIENDLY-EMAIL-TEST.png",
+      "https://i.postimg.cc/18jVY2hC/PERSUASIVE-EMAIL-TEST.png",
+      "https://i.postimg.cc/K1H3swSn/MEETING-NOTES-TEST-1.png",
+      "https://i.postimg.cc/bZBSFWc6/MEETING-NOTES-TEST-2.png",
+      "https://i.postimg.cc/PCRvF9sR/TASK-PLANNER-1.png",
+      "https://i.postimg.cc/dhxZSpcM/TASK-PLANNER-2.png",
+      "https://i.postimg.cc/LJbg0wKL/AI-CHAT-TEST.png",
+      formal,
+    ];
+  }, []);
   const empty = useMemo(() => Array.from({ length: SHOT_COUNT }, () => ""), []);
-  const [shots, setShots] = useState<string[]>(empty);
+  const [shots, setShots] = useState<string[]>(defaults);
   const [active, setActive] = useState(0);
   const [consoleOpen, setConsoleOpen] = useState(false);
 
@@ -776,14 +790,16 @@ function Slide7({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boole
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
-          const next = empty.map((_, i) => (typeof parsed[i] === "string" ? parsed[i] : ""));
+          const next = defaults.map((def, i) =>
+            typeof parsed[i] === "string" && parsed[i].trim() ? parsed[i] : def,
+          );
           setShots(next);
         }
       }
     } catch {
       /* ignore */
     }
-  }, [empty]);
+  }, [defaults]);
 
   const persist = (next: string[]) => {
     setShots(next);
@@ -801,6 +817,7 @@ function Slide7({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boole
   };
 
   const clearAll = () => persist([...empty]);
+  const resetDefaults = () => persist([...defaults]);
 
   const go = (n: number) => setActive((n + SHOT_COUNT) % SHOT_COUNT);
   const next = () => go(active + 1);
