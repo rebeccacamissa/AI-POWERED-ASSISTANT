@@ -359,31 +359,8 @@ function Slide2({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boole
             className="relative aspect-[4/5] w-full max-w-md rounded-sm p-4"
             style={{ background: "#fff", boxShadow: `0 30px 60px -30px ${NAVY}55`, border: `1px solid ${GOLD}55` }}
           >
-            <div className="relative h-full w-full overflow-hidden" style={{ background: NAVY }}>
-              <svg viewBox="0 0 300 380" className="h-full w-full">
-                <defs>
-                  <pattern id="paper" width="20" height="20" patternUnits="userSpaceOnUse">
-                    <rect width="20" height="20" fill={NAVY} />
-                    <path d="M0 10 H20" stroke={GOLD} strokeOpacity="0.08" />
-                  </pattern>
-                </defs>
-                <rect width="300" height="380" fill="url(#paper)" />
-                {Array.from({ length: 9 }).map((_, i) => (
-                  <rect
-                    key={i}
-                    x={30 + (i % 3) * 80}
-                    y={30 + Math.floor(i / 3) * 110}
-                    width="70"
-                    height="95"
-                    fill="none"
-                    stroke={GOLD}
-                    strokeOpacity={0.5 + (i % 3) * 0.15}
-                    transform={`rotate(${(i - 4) * 3} ${65 + (i % 3) * 80} ${78 + Math.floor(i / 3) * 110})`}
-                  />
-                ))}
-                <circle cx="240" cy="60" r="22" fill="none" stroke={GOLD} />
-                <circle cx="240" cy="60" r="34" fill="none" stroke={GOLD} strokeOpacity="0.5" />
-              </svg>
+            <div className="relative h-full w-full overflow-hidden rounded-sm" style={{ background: NAVY, border: `1px solid ${GOLD}88` }}>
+              <StarryNightArt />
               <div
                 className="absolute bottom-3 left-3 right-3 text-center text-xs italic"
                 style={{ ...display, color: BEIGE, opacity: 0.7 }}
