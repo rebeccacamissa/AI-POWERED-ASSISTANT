@@ -113,6 +113,111 @@ function SwirlLight() {
   );
 }
 
+/* ---------- Starry Night vector art ---------- */
+function StarryNightArt() {
+  return (
+    <svg viewBox="0 0 300 380" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full">
+      <defs>
+        <radialGradient id="snSky" cx="50%" cy="40%" r="80%">
+          <stop offset="0%" stopColor="#2d3e6b" />
+          <stop offset="55%" stopColor={NAVY} />
+          <stop offset="100%" stopColor="#0f172a" />
+        </radialGradient>
+        <radialGradient id="snStar" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#fff8d6" stopOpacity="1" />
+          <stop offset="40%" stopColor={GOLD} stopOpacity="0.95" />
+          <stop offset="100%" stopColor={GOLD} stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="snMoon" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#fbe9a8" />
+          <stop offset="60%" stopColor={GOLD} stopOpacity="0.9" />
+          <stop offset="100%" stopColor={GOLD} stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id="snHill" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#1a2540" />
+          <stop offset="100%" stopColor="#0a1124" />
+        </linearGradient>
+      </defs>
+
+      {/* Sky */}
+      <rect width="300" height="380" fill="url(#snSky)" />
+
+      {/* Swirling brushstroke wind */}
+      <g fill="none" stroke={GOLD} strokeLinecap="round">
+        <path d="M-20,140 C40,80 110,200 170,140 C220,90 260,170 320,120" strokeWidth="2.2" opacity="0.85" />
+        <path d="M-20,160 C40,100 110,220 170,160 C220,110 260,190 320,140" strokeWidth="1.2" opacity="0.55" />
+        <path d="M-20,180 C40,120 110,240 170,180 C220,130 260,210 320,160" strokeWidth="0.8" opacity="0.35" />
+
+        {/* Central great swirl */}
+        <path d="M120,170 C150,150 190,170 190,200 C190,235 140,240 130,210 C123,188 150,180 165,195 C175,205 168,222 152,220" strokeWidth="1.8" opacity="0.9" />
+        <path d="M115,175 C150,145 200,170 200,205 C200,250 130,255 120,215" strokeWidth="1" opacity="0.55" />
+
+        {/* Secondary swirl */}
+        <path d="M30,90 C50,75 80,90 80,110 C80,130 50,135 45,118 C42,108 55,103 62,112" strokeWidth="1.4" opacity="0.8" />
+
+        {/* Distant wind streams */}
+        <path d="M-10,250 C60,210 140,270 220,230 C260,210 290,225 320,215" strokeWidth="1" opacity="0.5" />
+        <path d="M-10,270 C60,230 140,290 220,250 C260,230 290,245 320,235" strokeWidth="0.7" opacity="0.35" />
+      </g>
+
+      {/* Stars */}
+      <g>
+        <circle cx="60" cy="80" r="18" fill="url(#snStar)" />
+        <circle cx="60" cy="80" r="4" fill="#fff8d6" />
+        <circle cx="155" cy="200" r="22" fill="url(#snStar)" />
+        <circle cx="155" cy="200" r="5" fill="#fff8d6" />
+        <circle cx="230" cy="115" r="14" fill="url(#snStar)" />
+        <circle cx="230" cy="115" r="3" fill="#fff8d6" />
+        <circle cx="105" cy="55" r="10" fill="url(#snStar)" />
+        <circle cx="105" cy="55" r="2" fill="#fff8d6" />
+        <circle cx="200" cy="60" r="9" fill="url(#snStar)" />
+        <circle cx="200" cy="60" r="2" fill="#fff8d6" />
+        <circle cx="265" cy="180" r="11" fill="url(#snStar)" />
+        <circle cx="265" cy="180" r="2.5" fill="#fff8d6" />
+
+        {/* Crescent moon top right */}
+        <g>
+          <circle cx="260" cy="55" r="26" fill="url(#snMoon)" />
+          <circle cx="260" cy="55" r="11" fill="#fbe9a8" />
+          <circle cx="266" cy="52" r="9" fill={NAVY} opacity="0.85" />
+        </g>
+      </g>
+
+      {/* Rolling hill horizon */}
+      <path d="M0,300 C60,275 130,305 200,285 C250,272 280,295 300,290 L300,380 L0,380 Z" fill="url(#snHill)" />
+      <g fill="none" stroke={GOLD} strokeWidth="0.6" opacity="0.4">
+        <path d="M0,310 C60,288 130,315 200,295 C250,283 280,304 300,300" />
+        <path d="M0,325 C70,308 140,330 210,312 C260,300 285,318 300,316" opacity="0.7" />
+      </g>
+
+      {/* Village windows */}
+      <g fill={GOLD} opacity="0.9">
+        <rect x="170" y="285" width="2" height="3" />
+        <rect x="180" y="288" width="2" height="3" />
+        <rect x="195" y="287" width="2" height="3" />
+        <rect x="215" y="290" width="2" height="3" />
+      </g>
+
+      {/* Cypress silhouette on the left edge */}
+      <g>
+        <path
+          d="M55,380 C40,340 38,300 48,250 C40,220 50,180 42,140 C56,150 60,180 58,210 C70,200 75,230 68,260 C78,280 72,320 70,380 Z"
+          fill="#0a1020"
+          stroke={NAVY}
+          strokeWidth="0.5"
+        />
+        <path
+          d="M50,360 C44,330 46,300 52,270 M58,300 C56,280 62,260 60,240 M54,220 C52,200 58,180 56,160"
+          fill="none"
+          stroke={GOLD}
+          strokeOpacity="0.25"
+          strokeWidth="0.8"
+        />
+      </g>
+    </svg>
+  );
+}
+
 /* ---------- Editable primitive ---------- */
 function Editable({
   value,
@@ -359,31 +464,8 @@ function Slide2({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boole
             className="relative aspect-[4/5] w-full max-w-md rounded-sm p-4"
             style={{ background: "#fff", boxShadow: `0 30px 60px -30px ${NAVY}55`, border: `1px solid ${GOLD}55` }}
           >
-            <div className="relative h-full w-full overflow-hidden" style={{ background: NAVY }}>
-              <svg viewBox="0 0 300 380" className="h-full w-full">
-                <defs>
-                  <pattern id="paper" width="20" height="20" patternUnits="userSpaceOnUse">
-                    <rect width="20" height="20" fill={NAVY} />
-                    <path d="M0 10 H20" stroke={GOLD} strokeOpacity="0.08" />
-                  </pattern>
-                </defs>
-                <rect width="300" height="380" fill="url(#paper)" />
-                {Array.from({ length: 9 }).map((_, i) => (
-                  <rect
-                    key={i}
-                    x={30 + (i % 3) * 80}
-                    y={30 + Math.floor(i / 3) * 110}
-                    width="70"
-                    height="95"
-                    fill="none"
-                    stroke={GOLD}
-                    strokeOpacity={0.5 + (i % 3) * 0.15}
-                    transform={`rotate(${(i - 4) * 3} ${65 + (i % 3) * 80} ${78 + Math.floor(i / 3) * 110})`}
-                  />
-                ))}
-                <circle cx="240" cy="60" r="22" fill="none" stroke={GOLD} />
-                <circle cx="240" cy="60" r="34" fill="none" stroke={GOLD} strokeOpacity="0.5" />
-              </svg>
+            <div className="relative h-full w-full overflow-hidden rounded-sm" style={{ background: NAVY, border: `1px solid ${GOLD}88` }}>
+              <StarryNightArt />
               <div
                 className="absolute bottom-3 left-3 right-3 text-center text-xs italic"
                 style={{ ...display, color: BEIGE, opacity: 0.7 }}
@@ -679,27 +761,52 @@ function Slide6({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boole
 }
 
 function Slide7({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boolean }) {
-  const [draftUrl, setDraftUrl] = useState(d.s7.mediaUrl);
-  const [playing, setPlaying] = useState(false);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const url = d.s7.mediaUrl.trim();
+  const STORAGE_KEY = "atelier.s7.shots";
+  const SHOT_COUNT = 9;
+  const empty = useMemo(() => Array.from({ length: SHOT_COUNT }, () => ""), []);
+  const [shots, setShots] = useState<string[]>(empty);
+  const [active, setActive] = useState(0);
+  const [consoleOpen, setConsoleOpen] = useState(false);
 
-  const isIframe = /^<iframe[\s\S]+<\/iframe>$/i.test(url);
-  const isImage = /\.(gif|png|jpe?g|webp)$/i.test(url);
-  const isVideo = /\.(mp4|webm|mov)$/i.test(url);
-  const isYouTube = /youtube\.com|youtu\.be/.test(url);
+  // Load from localStorage on mount
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          const next = empty.map((_, i) => (typeof parsed[i] === "string" ? parsed[i] : ""));
+          setShots(next);
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [empty]);
 
-  const togglePlay = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    if (v.paused) {
-      v.play();
-      setPlaying(true);
-    } else {
-      v.pause();
-      setPlaying(false);
+  const persist = (next: string[]) => {
+    setShots(next);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      /* ignore */
     }
   };
+
+  const updateShot = (i: number, v: string) => {
+    const next = [...shots];
+    next[i] = v;
+    persist(next);
+  };
+
+  const clearAll = () => persist([...empty]);
+
+  const go = (n: number) => setActive((n + SHOT_COUNT) % SHOT_COUNT);
+  const next = () => go(active + 1);
+  const prev = () => go(active - 1);
+
+  const currentUrl = shots[active]?.trim() ?? "";
 
   return (
     <SlideShell theme="dark">
@@ -707,19 +814,33 @@ function Slide7({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boole
         <div className="text-xs uppercase tracking-[0.4em]" style={{ color: GOLD, ...sans }}>
           Demonstration
         </div>
-        <Editable
-          as="h2"
-          value={d.s7.heading}
-          onChange={(v) => set({ ...d, s7: { ...d.s7, heading: v } })}
-          editMode={edit}
-          className="mt-2 text-4xl md:text-5xl font-medium"
-          style={{ ...display, color: BEIGE }}
-        />
-        <div className="mt-8 flex flex-1 items-center justify-center">
+        <div className="flex items-center justify-between gap-4">
+          <Editable
+            as="h2"
+            value={d.s7.heading}
+            onChange={(v) => set({ ...d, s7: { ...d.s7, heading: v } })}
+            editMode={edit}
+            className="mt-2 text-4xl md:text-5xl font-medium"
+            style={{ ...display, color: BEIGE }}
+          />
+          {edit && (
+            <button
+              onClick={() => setConsoleOpen((v) => !v)}
+              className="flex items-center gap-2 rounded-full px-4 py-1.5 text-xs"
+              style={{ border: `1px solid ${GOLD}`, color: GOLD, ...sans }}
+            >
+              <TerminalSquare size={14} />
+              {consoleOpen ? "Hide Console" : "Open URL Console"}
+            </button>
+          )}
+        </div>
+
+        <div className="mt-6 flex flex-1 items-center justify-center">
           <div
             className="w-full max-w-4xl overflow-hidden rounded-lg"
             style={{ background: "#0f1626", border: `1px solid ${GOLD}55`, boxShadow: `0 40px 80px -30px ${GOLD}44` }}
           >
+            {/* Browser chrome */}
             <div className="flex items-center gap-2 border-b px-4 py-2.5" style={{ borderColor: `${GOLD}33` }}>
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: "#ff5f56" }} />
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: GOLD }} />
@@ -728,66 +849,124 @@ function Slide7({ d, set, edit }: { d: Deck; set: (d: Deck) => void; edit: boole
                 className="ml-4 flex-1 truncate rounded px-3 py-1 text-xs"
                 style={{ background: "#1a2236", color: BEIGE, ...sans }}
               >
-                atelier-ai.lovable.app/demo
+                atelier-ai.lovable.app/tour/{String(active + 1).padStart(2, "0")}
               </div>
+              <span
+                className="rounded-full px-2.5 py-0.5 text-[10px] tracking-[0.2em] uppercase"
+                style={{ background: `${GOLD}22`, color: GOLD, border: `1px solid ${GOLD}55`, ...sans }}
+              >
+                {active + 1} / {SHOT_COUNT}
+              </span>
             </div>
+
+            {/* Screenshot stage */}
             <div className="relative" style={{ aspectRatio: "16 / 9", background: NAVY }}>
-              {!url && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
+              {currentUrl ? (
+                <img
+                  src={currentUrl}
+                  alt={`Screenshot ${active + 1}`}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-6 text-center">
+                  <span className="text-xs uppercase tracking-[0.35em]" style={{ color: GOLD, ...sans }}>
+                    Screenshot {active + 1}
+                  </span>
                   <span className="text-sm" style={{ ...sans, color: "#d4c9af", opacity: 0.7 }}>
-                    Paste a video URL, GIF link, or full &lt;iframe&gt; embed below.
+                    No image yet — open Edit Mode and paste a direct image URL.
                   </span>
                 </div>
               )}
-              {url && isIframe && (
-                <div className="absolute inset-0 [&>iframe]:h-full [&>iframe]:w-full" dangerouslySetInnerHTML={{ __html: url }} />
-              )}
-              {url && isYouTube && !isIframe && (
-                <iframe
-                  className="absolute inset-0 h-full w-full"
-                  src={url.replace("watch?v=", "embed/")}
-                  title="Demo"
-                  allow="autoplay; encrypted-media"
-                  allowFullScreen
-                />
-              )}
-              {url && isImage && <img src={url} alt="Demo" className="absolute inset-0 h-full w-full object-cover" />}
-              {url && isVideo && (
-                <video ref={videoRef} src={url} className="absolute inset-0 h-full w-full object-cover" />
-              )}
-              {url && !isIframe && !isYouTube && !isImage && !isVideo && (
-                <iframe className="absolute inset-0 h-full w-full" src={url} title="Demo" />
-              )}
-            </div>
-            <div className="flex flex-wrap items-center gap-3 border-t px-4 py-3" style={{ borderColor: `${GOLD}33` }}>
-              {isVideo && (
-                <button
-                  onClick={togglePlay}
-                  className="flex items-center gap-2 rounded-full px-4 py-1.5 text-xs"
-                  style={{ background: GOLD, color: NAVY, ...sans }}
-                >
-                  {playing ? <Pause size={14} /> : <Play size={14} />}
-                  {playing ? "Pause" : "Play"}
-                </button>
-              )}
-              <input
-                value={draftUrl}
-                onChange={(e) => setDraftUrl(e.target.value)}
-                onKeyDown={(e) => e.stopPropagation()}
-                placeholder="https://… or paste <iframe …></iframe>"
-                className="flex-1 rounded px-3 py-1.5 text-xs outline-none"
-                style={{ background: "#1a2236", color: BEIGE, border: `1px solid ${GOLD}33`, ...sans }}
-              />
+
+              {/* Arrow controls */}
               <button
-                onClick={() => set({ ...d, s7: { ...d.s7, mediaUrl: draftUrl } })}
-                className="rounded-full px-4 py-1.5 text-xs"
-                style={{ border: `1px solid ${GOLD}`, color: GOLD, ...sans }}
+                onClick={prev}
+                aria-label="Previous screenshot"
+                className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full backdrop-blur transition hover:scale-105"
+                style={{ background: `${NAVY}cc`, border: `1px solid ${GOLD}88`, color: GOLD }}
               >
-                Load
+                <ChevronLeft size={20} />
               </button>
+              <button
+                onClick={next}
+                aria-label="Next screenshot"
+                className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full backdrop-blur transition hover:scale-105"
+                style={{ background: `${NAVY}cc`, border: `1px solid ${GOLD}88`, color: GOLD }}
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+
+            {/* Pagination dots */}
+            <div className="flex flex-wrap items-center justify-center gap-2 border-t px-4 py-3" style={{ borderColor: `${GOLD}33` }}>
+              {shots.map((s, i) => {
+                const isActive = i === active;
+                const hasImg = Boolean(s.trim());
+                return (
+                  <button
+                    key={i}
+                    onClick={() => go(i)}
+                    aria-label={`Go to screenshot ${i + 1}`}
+                    className="flex h-7 w-7 items-center justify-center rounded-full text-[11px] transition"
+                    style={{
+                      background: isActive ? GOLD : "transparent",
+                      color: isActive ? NAVY : BEIGE,
+                      border: `1px solid ${hasImg ? GOLD : `${GOLD}55`}`,
+                      ...sans,
+                      fontWeight: isActive ? 600 : 400,
+                    }}
+                  >
+                    {i + 1}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
+
+        {/* Edit-mode console */}
+        {edit && consoleOpen && (
+          <div
+            className="mt-4 w-full max-w-4xl self-center rounded-lg p-4"
+            style={{ background: "#0a1124", border: `1px solid ${GOLD}55` }}
+          >
+            <div className="mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-2" style={{ color: GOLD }}>
+                <TerminalSquare size={14} />
+                <span className="text-[10px] uppercase tracking-[0.3em]" style={sans}>
+                  Screenshot URL Console · saved to localStorage
+                </span>
+              </div>
+              <button
+                onClick={clearAll}
+                className="rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.2em]"
+                style={{ border: `1px solid ${GOLD}55`, color: BEIGE, ...sans }}
+              >
+                Clear all
+              </button>
+            </div>
+            <div className="grid max-h-60 grid-cols-1 gap-2 overflow-auto pr-1 md:grid-cols-3">
+              {shots.map((s, i) => (
+                <label key={i} className="flex items-center gap-2">
+                  <span
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px]"
+                    style={{ background: `${GOLD}22`, color: GOLD, border: `1px solid ${GOLD}55`, ...sans }}
+                  >
+                    {i + 1}
+                  </span>
+                  <input
+                    value={s}
+                    onChange={(e) => updateShot(i, e.target.value)}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    placeholder="https://…/screenshot.png"
+                    className="flex-1 rounded px-2 py-1 text-[11px] outline-none"
+                    style={{ background: "#1a2236", color: BEIGE, border: `1px solid ${GOLD}33`, ...mono }}
+                  />
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </SlideShell>
   );
